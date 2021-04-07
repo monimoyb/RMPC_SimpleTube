@@ -15,7 +15,7 @@ yalmip 'clear'
 err_modBound1 = epsA*Xub + epsB*Uub + wub;  
 err_modBound2 = -epsA*Xlb - epsB*Ulb - wlb;                                                                   % can be ASYMMETRIC BOUND
 err_modBound = max(err_modBound1, err_modBound2); 
-W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                     % NET W
+W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                         % NET W
 
 %% Form the terminal set and Cost here 
 W_Term = Polyhedron('lb',wlb*ones(nx,1),'ub',wub*ones(nx,1));                                          
@@ -84,7 +84,11 @@ for i = 1:size(dVector,2)
 end
 
 
-%% Plot the ROA (Actually, only the union; not the CVX hull of the union! But plotting the CVX hull here gives the correct set too.)
+%% Plot the ROA 
+% Actually, only the union; not the CVX hull of the union! But plotting the CVX hull here gives the correct set too. 
+% If trying on a different example, please store line 81 array with an extra dimension for each Nhor and display
+% the union of the CVX hulls of each dimension's vertices as the ROA. 
+
 Xfeas = Polyhedron(x0feas');
 figure
 plot(Xfeas, 'color', 'b')
