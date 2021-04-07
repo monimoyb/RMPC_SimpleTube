@@ -84,7 +84,7 @@ for i = 1:size(dVector,2)
 end
 
 
-%% Plot the ROA
+%% Plot the ROA (Actually, only the union; not the CVX hull of the union! But plotting the CVX hull here gives the correct set too.)
 Xfeas = Polyhedron(x0feas');
 figure
 plot(Xfeas, 'color', 'b')
