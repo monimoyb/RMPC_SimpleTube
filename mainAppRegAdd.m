@@ -2,6 +2,7 @@
 % This method lumps up model mismatch component as additive uncertainty for N > 1
 % BUT, using exact uncertainty for N=1 and the terminal set 
 % Author: Monimoy Bujarbaruah
+
 %%
 clear all
 close all
@@ -10,12 +11,10 @@ yalmip 'clear'
 
 %% MPC Controller Parameters
 [Anom,Bnom, epsA, epsB, delAv, delBv, K, A, B, X, U, Xlb, Xub, Ulb, Uub, nx, nu, wub,wlb, x_0, Q, R, simsteps, N] = sys_loadNew();
+
 %% Form the net additive error bound here
-% ||A||_1 \leq sqrt(m) ||A||_2 for m*n matrix A
-err_modBound1 = epsA*Xub + epsB*Uub + wub;  
-err_modBound2 = -epsA*Xlb - epsB*Ulb - wlb;                                                                   % can be ASYMMETRIC BOUND
-err_modBound = max(err_modBound1, err_modBound2); 
-W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                         % NET W
+err_modBound = epsA*Xub + epsB*Uub + wub;  
+W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                         % NET tilde W
 
 %% Form the terminal set and Cost here 
 W_Term = Polyhedron('lb',wlb*ones(nx,1),'ub',wub*ones(nx,1));                                          
@@ -82,7 +81,6 @@ for i = 1:size(dVector,2)
     
     end
 end
-
 
 %% Plot the ROA 
 % Actually, only the union; not the CVX hull of the union! But plotting the CVX hull here gives the correct set too. 
