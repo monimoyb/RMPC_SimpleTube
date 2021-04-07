@@ -22,6 +22,7 @@ C = [X.A; zeros(size(U.A,1), nx)];
 D = [zeros(size(X.A,1), nu); U.A]; 
 b = [X.b; U.b]; 
 [Xn, Pinf] = term_setRobPar(Anom, Bnom, delAv, delBv, K, X, U, W_Term, Q, R, nx, nu);        
+
 %%% Needed for constraint loop
 for i = 1:size(delAv,2)/nx
     setdelA(:,:,i) = delAv(:,(i-1)*nx + 1: i*nx);  
@@ -33,6 +34,7 @@ end
 
 %% Pick this based on what we need 
 N_start = 1;            % N or 1. N gives the approx. N-Step robust reachable set. 1 gives the approx ROA.  
+
 %% Form all the required stuff for all horizon options
 for Nhor = N_start:N
     dim_ttmp = size(C,1)*Nhor + size(Xn.A,1);  
