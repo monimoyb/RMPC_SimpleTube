@@ -78,9 +78,9 @@ function [x0feas_out, x0feasNormOut] = FTOCP_add(dVector, vSign, Anom, Bnom, N, 
    
     
     if feas_flag ~=0
-        cost_flag = inf;                     % store high cost if any issue
+        cost_flag = inf;                    % store high cost if any issue
         x0feas_out = double(x0feas);
-        x0feasNormOut = 0;
+        x0feasNormOut = inf;                % signal of infeasibility!
     else
         cost_flag = double(cost);           % store right cost if feasible  
         v_hor = double(v); 
