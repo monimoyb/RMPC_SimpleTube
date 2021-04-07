@@ -66,7 +66,7 @@ function [feas_flag, cost_flag, v_hor, sol_time] = FTOCP_addTime(x_0, Q, R, Pinf
             end
         end
    
-        constraints = [constraints; Lambda*boldHw == Fx];                               % state con
+        constraints = [constraints; Lambda*boldHw == Fx];                          % state con
    
    else      
         %%  Open Loop W Variables  
@@ -81,7 +81,7 @@ function [feas_flag, cost_flag, v_hor, sol_time] = FTOCP_addTime(x_0, Q, R, Pinf
         Z = sdpvar(dim_a,dim_t);  
         constraints = [constraints; matF*v + Z'*hs <= mat_c + matH*x0feas];
         constraints = [constraints; Z>=0];
-        constraints = [constraints, matF*M + matG == Z'*Hs];                           % joint con
+        constraints = [constraints, matF*M + matG == Z'*Hs];                       % joint con (see www.sciencedirect.com/science/article/pii/S0005109806000021)
    end
    
    %% Optimize 
@@ -92,7 +92,7 @@ function [feas_flag, cost_flag, v_hor, sol_time] = FTOCP_addTime(x_0, Q, R, Pinf
    
     
     if feas_flag ~=0
-        cost_flag = inf;                             % store high cost if any issue
+        cost_flag = inf;                       % store high cost if any issue
         v_hor = zeros(nu*N,1);                 % just store some dummy 0's if infeasible anyway
     else
         cost_flag = double(obj_ol);            % store right cost if feasible  
