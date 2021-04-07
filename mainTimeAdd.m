@@ -2,6 +2,7 @@
 % This method lumps up model mismatch component as additive uncertainty for N > 1
 % BUT, using exact uncertainty for N=1 and the terminal set 
 % Author: Monimoy Bujarbaruah
+
 %%
 clear all
 close all
@@ -10,21 +11,22 @@ yalmip 'clear'
 
 %% MPC Controller Parameters
 [Anom,Bnom, epsA, epsB, delAv, delBv, K, A, B, X, U, Xlb, Xub, Ulb, Uub, nx, nu, wub,wlb, x_0, Q, R, simsteps, N] = sys_loadNew();
+
 %% Form the net additive error bound here
-% ||A||_1 \leq sqrt(m) ||A||_2 for m*n matrix A
-err_modBound1 = epsA*Xub + epsB*Uub + wub;  
-err_modBound2 = -epsA*Xlb - epsB*Ulb - wlb;                                                                   % can be ASYMMETRIC BOUND
-err_modBound = max(err_modBound1, err_modBound2); 
-W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                     % NET W
+err_modBound = epsA*Xub + epsB*Uub + wub;   
+W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                     % NET tilde W
+
 %% Form the terminal set and Cost here 
 W_Term = Polyhedron('lb',wlb*ones(nx,1),'ub',wub*ones(nx,1));                                          
 C = [X.A; zeros(size(U.A,1), nx)]; 
 D = [zeros(size(X.A,1), nu); U.A]; 
 b = [X.b; U.b]; 
 [Xn, Pinf] = term_setRobPar(Anom, Bnom, delAv, delBv, K, X, U, W_Term, Q, R, nx, nu);        
+
 %% For closed loop trajectory recording  
 x_cl = zeros(nx,simsteps+1);
 u_cl = zeros(nu,simsteps); 
+
 %% Needed for constraint loop
 for i = 1:size(delAv,2)/nx
     setdelA(:,:,i) = delAv(:,(i-1)*nx + 1: i*nx);  
@@ -36,6 +38,7 @@ end
 
 %% N problems to be solved here at any step
 N_start = 1;             
+
 %% Form all the required stuff for all horizon options
 for Nhor = N_start:N
     dim_ttmp = size(C,1)*Nhor + size(Xn.A,1);  
@@ -51,7 +54,7 @@ end
 x_cl(:,1) = x_0;                                                  
 N_start = 1;
 
-for i = 1:simsteps                                                                          % will record these times in closed-loop
+for i = 1:simsteps                                                                         % will record these times in closed-loop
      x_init = x_cl(:,i);    
      
      for Nhor = N_start:N
@@ -63,14 +66,14 @@ for i = 1:simsteps                                                              
     [value_mincost, ind_mincost] = min(cost_flag); 
     
     if value_mincost == inf
-        disp('*** infeasible problem***')                                          % should not happen if no bug
+        disp('*** infeasible problem***')                                                  % should not happen if no bug
         break
     else
          v_hor = v_horN{ind_mincost};
     end
      
-    %% Obtaining Closed Loop Parameters 
-    u_cl(:,i) = v_hor(1:nu,:);                                                           % Closed loop control 
+  %% Obtaining Closed Loop Parameters 
+    u_cl(:,i) = v_hor(1:nu,:);                                                             % Closed loop control 
   %% Actual System Simulation in Closed Loop 
     w = wlb + (wub-wlb)*rand(nx,1);                                               
     x_cl(:,i+1) = A*x_cl(:,i) + B*u_cl(:,i) +  w;      
@@ -80,4 +83,4 @@ end
 
 
 %% Get the mean solver time 
-online_time = mean(sol_time,2);                                                   % Output given for each horizon
+online_time = mean(sol_time,2);                                                            % For each horizon
