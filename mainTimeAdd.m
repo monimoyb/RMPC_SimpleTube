@@ -10,7 +10,7 @@ clc
 yalmip 'clear'
 
 %% MPC Controller Parameters
-[Anom,Bnom, epsA, epsB, delAv, delBv, K, A, B, X, U, Xlb, Xub, Ulb, Uub, nx, nu, wub,wlb, x_0, Q, R, simsteps, N] = sys_loadNew();
+[Anom,Bnom, epsA, epsB, delAv, delBv, K, A, B, X, U, Xub, Uub, nx, nu, wub,wlb, x_0, Q, R, simsteps, N] = sys_loadNew();
 
 %% Form the net additive error bound here
 err_modBound = epsA*Xub + epsB*Uub + wub;   
