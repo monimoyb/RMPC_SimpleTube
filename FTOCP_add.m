@@ -49,7 +49,7 @@ function [x0feas_out, x0feasNormOut] = FTOCP_add(dVector, vSign, Anom, Bnom, N, 
             end
         end
    
-        constraints = [constraints; Lambda*boldHw == Fx];                               % state con
+        constraints = [constraints; Lambda*boldHw == Fx];                           % state con
    
    else      
         %%  Open Loop W Variables  
@@ -64,11 +64,11 @@ function [x0feas_out, x0feasNormOut] = FTOCP_add(dVector, vSign, Anom, Bnom, N, 
         Z = sdpvar(dim_a,dim_t);  
         constraints = [constraints; matF*v + Z'*hs <= mat_c + matH*x0feas];
         constraints = [constraints; Z>=0];
-        constraints = [constraints, matF*M + matG == Z'*Hs];                          % joint con
+        constraints = [constraints, matF*M + matG == Z'*Hs];                          % joint con (See www.sciencedirect.com/science/article/pii/S0005109806000021)
    end
    
    constraints = [constraints; dVector(2)*x0feas(1) == dVector(1)*x0feas(2)]; 
-   constraints = [constraints; X.A*x0feas <= X.b];                                          % common for both cases
+   constraints = [constraints; X.A*x0feas <= X.b];                                    % common for both cases
    
     cost = vSign*dVector'*x0feas;  
    
@@ -82,7 +82,7 @@ function [x0feas_out, x0feasNormOut] = FTOCP_add(dVector, vSign, Anom, Bnom, N, 
         x0feas_out = double(x0feas);
         x0feasNormOut = 0;
     else
-        cost_flag = double(cost);        % store right cost if feasible  
+        cost_flag = double(cost);           % store right cost if feasible  
         v_hor = double(v); 
         x0feas_out = double(x0feas);
         x0feasNormOut = norm(x0feas_out,2);
