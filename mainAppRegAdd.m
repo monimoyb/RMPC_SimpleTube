@@ -33,7 +33,7 @@ for i = 1:size(delBv,2)/nu
 end
 
 %% Pick this based on what we need 
-N_start = 1;            % N or 1. N gives the approx. N-Step robust reachable set. 1 gives the approx ROA.  
+N_start = 1;            % N or 1. N gives the approx. N-Step robust controllable set. 1 gives the approx ROA.  
 
 %% Form all the required stuff for all horizon options
 for Nhor = N_start:N
@@ -47,48 +47,40 @@ for Nhor = N_start:N
 end
 
 %% Main Loop Runs start here
-count_inf = 0;                      % counts the number of infeasible points
-xfeas = [];
-xinfs = []; 
 %%% vector directions to get inner approximate. Pick anything here. 
-dVector{1} =  [1;1];
-dVector{2} = [ 0;1];
-dVector{3} = [ 1;0];
+dVector{1} = [1;1];
+dVector{2} = [0;1];
+dVector{3} = [1;0];
 dVector{4} = [-1;1];
-dVector{5} = [ 2;-6];
+dVector{5} = [2;-6];
 dVector{6} = [2;6];
 dVector{7} = [-6;8.2];
 dVector{8} = [8.1;-6.2];
 dVector{9} = [8.0;-4.439];
-vSign{1}    =  1;
-vSign{2}    = -1;
-x0feas = [];
-counter = 1;
-idxBestNorm = [];
-%%
-for i = 1:size(dVector,2)
-    for j =1:2
-        for Nhor = N_start:N
-            [x0feas_out{Nhor}, x0feasNormOut(Nhor)] = FTOCP_add(dVector{i}, vSign{j}, Anom, Bnom, Nhor, X, U, Xn, setdelA, setdelB, W, W_Term, nx, nu, ...
-                                                                                              dim_t{Nhor}, matF{Nhor}, matG{Nhor}, matH{Nhor}, mat_c{Nhor}); 
+%%% check negative directions too
+vSign{1} =  1;
+vSign{2} = -1;
+
+%% Main Loop 
+for Nhor = N_start:N    
+    x0feas = []; 
+    for i = 1:size(dVector,2)
+        for j = 1:2
+            [x0feas_out{j}, x0feasNormOut(j)] = FTOCP_add(dVector{i}, vSign{j}, Anom, Bnom, Nhor, X, U, Xn, setdelA, setdelB, W, W_Term, nx, nu, ...
+                                                                                          dim_t{Nhor}, matF{Nhor}, matG{Nhor}, matH{Nhor}, mat_c{Nhor}); 
+            if x0feasNormOut(j) ~= inf
+                x0feas = [x0feas, x0feas_out{j}];               % add only if feasible 
+            end          
         end
-        
-        % pick best cost 
-        [~, ind_maxNorm] = max(x0feasNormOut); 
-        x0feas_normout{i,j} = x0feasNormOut;
-        
-        idxBestNorm = [idxBestNorm, ind_maxNorm];
-    
-        x0feas = [x0feas, x0feas_out{ind_maxNorm}];
-    
     end
+    
+    x0feasM{Nhor} = x0feas;                                     % storing all feasible points horizon-wise
 end
 
-%% Plot the ROA 
-% Actually, only the union; not the CVX hull of the union! But plotting the CVX hull here gives the correct set too. 
-% If trying on a different example, please store line 81 array with an extra dimension for each Nhor and display
-% the union of the CVX hulls of each dimension's vertices as the ROA. 
-
-Xfeas = Polyhedron(x0feas');
-figure
-plot(Xfeas, 'color', 'b')
+%% Plot the Approx ROA
+% It's the union for all Nhors; not the CVX hull of the union! (Although the result in the paper won't vary)
+figure; 
+for i = 1: length(x0feasM)
+    NRC = Polyhedron(x0feasM{i}');                              % corresponding approx. N-step robust controllable set
+    plot(NRC, 'color', 'b'); hold on; 
+end
