@@ -68,7 +68,7 @@ for Nhor = N_start:N
         for j = 1:2
             [x0feas_out{j}, x0feasNormOut(j)] = FTOCP_add(dVector{i}, vSign{j}, Anom, Bnom, Nhor, X, U, Xn, setdelA, setdelB, W, W_Term, nx, nu, ...
                                                                                           dim_t{Nhor}, matF{Nhor}, matG{Nhor}, matH{Nhor}, mat_c{Nhor}); 
-            if x0feasNormOut(j) ~= inf
+            if x0feasNormOut(j) ~= -inf
                 x0feas = [x0feas, x0feas_out{j}];               % add only if feasible 
             end          
         end
