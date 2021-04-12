@@ -1,4 +1,4 @@
-# A simple Robust MPC for Linear Systems with Parameric and Additive Uncertainty
+# A simple Robust MPC for Linear Systems with Parametric and Additive Uncertainty
 
 These codes produce the results of our proposed algorithm, shown in the paper https://arxiv.org/abs/2103.12351. The Region of Attraction (ROA) of our controller (yellow set) contains about 98% of the ROA of Tube MPC (grey set, https://www.sciencedirect.com/science/article/pii/S0005109803002838?via%3Dihub, Section 5). The yellow ROA is about 4% larger in volume.
 
