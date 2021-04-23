@@ -12,9 +12,9 @@ yalmip 'clear'
 %% MPC Controller Parameters
 [Anom,Bnom, epsA, epsB, delAv, delBv, K, A, B, X, U, Xub, Uub, nx, nu, wub,wlb, x_0, Q, R, simsteps, N] = sys_loadNew();
 
-%% Form the net additive error bound here
+%% Form the net additive uncertainty bound here
 err_modBound = epsA*Xub + epsB*Uub + wub;   
-W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                     % NET tilde W
+W = Polyhedron('lb',-err_modBound,'ub',err_modBound);                                                     
 
 %% Form the terminal set and Cost here 
 W_Term = Polyhedron('lb',wlb*ones(nx,1),'ub',wub*ones(nx,1));                                          
@@ -55,12 +55,12 @@ x_cl(:,1) = x_0;
 N_start = 1;
 
 for i = 1:simsteps                                                                         % will record these times in closed-loop
-     x_init = x_cl(:,i);    
+    x_init = x_cl(:,i);    
      
-     for Nhor = N_start:N
-            [feas_flag(Nhor), cost_flag(Nhor), v_horN{Nhor}, sol_time(Nhor, i)] = FTOCP_addTime(x_init, Q, R, Pinf, Anom, Bnom, Nhor, X, U, Xn, setdelA, setdelB, W, W_Term, nx, nu, ...
-                                                                                             dim_t{Nhor}, matF{Nhor}, matG{Nhor}, matH{Nhor}, mat_c{Nhor}); 
-     end
+    for Nhor = N_start:N
+        [feas_flag(Nhor), cost_flag(Nhor), v_horN{Nhor}, sol_time(Nhor, i)] = FTOCP_addTime(x_init, Q, R, Pinf, Anom, Bnom, Nhor, X, U, Xn, setdelA, setdelB, W, W_Term, nx, nu, ...
+                                                                                         dim_t{Nhor}, matF{Nhor}, matG{Nhor}, matH{Nhor}, mat_c{Nhor}); 
+    end
         
     % pick best cost 
     [value_mincost, ind_mincost] = min(cost_flag); 
@@ -72,9 +72,9 @@ for i = 1:simsteps                                                              
          v_hor = v_horN{ind_mincost};
     end
      
-  %% Obtaining Closed Loop Parameters 
+    %% Obtaining Closed Loop Parameters 
     u_cl(:,i) = v_hor(1:nu,:);                                                             % Closed loop control 
-  %% Actual System Simulation in Closed Loop 
+    %% Actual System Simulation in Closed Loop 
     w = wlb + (wub-wlb)*rand(nx,1);                                               
     x_cl(:,i+1) = A*x_cl(:,i) + B*u_cl(:,i) +  w;      
     yalmip 'clear'   
