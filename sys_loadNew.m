@@ -20,10 +20,10 @@ function [Anom,Bnom, epsA, epsB, delAv, delBv, K, A, B, X, U, Xub, Uub, nx, nu, 
     epsB = 0.1; 
     
     %%%% Set the true A and B matrices (satisfy the above bounds)
-    A = [1, 0.1; 
+    A = [1, 0.15; 
            0, 1.0 ]; 
     B = [0; 
-         1.0];                    
+         1.1];                    
 
     %%%%% Weights %%%%%%%%%%%%%%%%%%%%%%%
     Q =  10*eye(nx);
